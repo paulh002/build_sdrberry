@@ -166,7 +166,7 @@ int main()
 			std::cout << "[REPO] Cloning public repository...\n";
 			{
 				WorkingDirGuard build_guard(build_root);
-				run_step("Cloning", "git clone --progress https://github.com/sdrberry/sdrberry.git");
+				run_step("Cloning", "git clone --progress https://github.com/paulh002/sdrberry.git");
 			}
 		}
 
