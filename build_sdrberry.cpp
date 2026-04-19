@@ -180,7 +180,7 @@ int main()
 
 			run_step("Configuring CMake", "cmake -B build -DCMAKE_BUILD_TYPE=Release");
 			run_step("Compiling", "cmake --build build -j$(nproc)");
-			run_step("Installing (local)", "cmake --install build --prefix " + install_dir.string());
+			run_step("Installing (local)", "sudo cmake --install build --prefix " + install_dir.string());
 
 			std::cout << "\n[DONE] Build & Install complete!\n";
 			std::cout << "[OUT] Output: " << install_dir / "bin" << "\n";
