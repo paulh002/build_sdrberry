@@ -160,7 +160,6 @@ int main()
 		if (std::filesystem::exists(repo_path / ".git"))
 		{
 			std::cout << "[REPO] Repository exists. Pulling latest changes...\n";
-			run_step("Pulling", "git pull");
 		}
 		else
 		{
@@ -173,6 +172,13 @@ int main()
 
 		{
 			WorkingDirGuard repo_guard(repo_path);
+
+			if (std::filesystem::exists(repo_path / ".git"))
+			{
+				std::cout << "[REPO] Pulling latest changes...\n";
+				run_step("Pulling", "git pull");
+			}
+
 			run_step("Configuring CMake", "cmake -B build -DCMAKE_BUILD_TYPE=Release");
 			run_step("Compiling", "cmake --build build -j$(nproc)");
 			run_step("Installing (local)", "sudo cmake --install build --prefix " + install_dir.string());
