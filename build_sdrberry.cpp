@@ -151,6 +151,7 @@ int main()
 {
 	try
 	{
+		bool pull = false;
 		std::filesystem::path build_root = "sdrberry_build";
 		std::filesystem::path repo_path = build_root / "sdrberry";
 		std::filesystem::path install_dir = std::filesystem::current_path() / "sdrberry_install";
@@ -160,6 +161,7 @@ int main()
 		if (std::filesystem::exists(repo_path / ".git"))
 		{
 			std::cout << "[REPO] Repository exists. Pulling latest changes...\n";
+			pull = true;
 		}
 		else
 		{
@@ -173,7 +175,7 @@ int main()
 		{
 			WorkingDirGuard repo_guard(repo_path);
 
-			if (std::filesystem::exists(repo_path / ".git"))
+			if (pull)
 			{
 				std::cout << "[REPO] Pulling latest changes...\n";
 				run_step("Pulling", "git pull");
