@@ -147,53 +147,62 @@ class WorkingDirGuard
 	std::filesystem::path original_path;
 };
 
+void update_repo(const std::string &name, const std::string &git_url,
+				 const std::filesystem::path &base_dir, const std::filesystem::path &install_base)
+{
+	auto repo_path = base_dir / name;
+	auto install_path = install_base / name;
+
+	if (std::filesystem::exists(repo_path / ".git"))
+	{
+		std::cout << "\n[REPO] " << name << " exists. Pulling latest changes...\n";
+		WorkingDirGuard wd(repo_path);
+		run_step("Pulling " + name, "git pull");
+	}
+	else
+	{
+		std::cout << "\n[REPO] Cloning " << name << "...\n";
+		WorkingDirGuard wd(base_dir);
+		run_step("Cloning " + name, "git clone --progress " + git_url + " " + name);
+	}
+
+	std::cout << "\n[BUILD] Processing " << name << "...\n";
+	WorkingDirGuard wd(repo_path);
+	run_step("Configuring " + name, "cmake -B build -DCMAKE_BUILD_TYPE=Release");
+	run_step("Compiling " + name, "cmake --build build -j$(nproc)");
+	run_step("Installing " + name, "sudo cmake --install build --prefix " + install_path.string());
+
+	std::cout << "[OUT] " << name << " installed to: " << install_path / "bin" << "\n";
+}
+
 int main()
 {
 	try
 	{
-		bool pull = false;
-		std::filesystem::path build_root = "sdrberry_build";
-		std::filesystem::path repo_path = build_root / "sdrberry";
-		std::filesystem::path install_dir = std::filesystem::current_path() / "sdrberry_install";
+		auto start_dir = std::filesystem::current_path();
+		std::filesystem::path build_base = start_dir / "sdrberry_build";
+		std::filesystem::path install_base = build_base / "install";
 
-		std::cout << "[LOC] Starting in: " << std::filesystem::current_path() << "\n\n";
+		std::filesystem::create_directories(build_base);
+		std::filesystem::create_directories(install_base);
 
-		if (std::filesystem::exists(repo_path / ".git"))
-		{
-			std::cout << "[REPO] Repository exists. Pulling latest changes...\n";
-			pull = true;
-		}
-		else
-		{
-			std::cout << "[REPO] Cloning public repository...\n";
-			{
-				WorkingDirGuard build_guard(build_root);
-				run_step("Cloning", "git clone --progress https://github.com/paulh002/sdrberry.git");
-			}
-		}
+		std::cout << "[LOC] Working directory: " << start_dir << "\n";
+		std::cout << "[DIR] Build & Install root: " << build_base << "\n\n";
 
-		{
-			WorkingDirGuard repo_guard(repo_path);
+		update_repo("sdrberry",
+					"https://github.com/paulh002/sdrberry.git",
+					build_base, install_base);
 
-			if (pull)
-			{
-				std::cout << "[REPO] Pulling latest changes...\n";
-				run_step("Pulling", "git pull");
-			}
+		update_repo("build_sdrberry",
+					"https://github.com/paulh002/build_sdrberry.git",
+					build_base, install_base);
 
-			run_step("Configuring CMake", "cmake -B build -DCMAKE_BUILD_TYPE=Release");
-			run_step("Compiling", "cmake --build build -j$(nproc)");
-			run_step("Installing (local)", "sudo cmake --install build --prefix " + install_dir.string());
-
-			std::cout << "\n[DONE] Build & Install complete!\n";
-			std::cout << "[OUT] Output: " << install_dir / "bin" << "\n";
-		}
-
-		std::cout << "[LOC] Back to original directory: " << std::filesystem::current_path() << '\n';
+		std::cout << "\n[DONE] All repositories updated and installed.\n";
+		std::cout << "[LOC] Back to: " << std::filesystem::current_path() << '\n';
 	}
 	catch (const std::exception &e)
 	{
-		std::cerr << "\n[ERR] Error: " << e.what() << '\n';
+		std::cerr << "\n[ERR] Fatal: " << e.what() << '\n';
 		return 1;
 	}
 	return 0;
