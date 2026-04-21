@@ -170,7 +170,18 @@ void update_repo(const std::string &name, const std::string &git_url,
 	WorkingDirGuard wd(repo_path);
 	run_step("Configuring " + name, "cmake -B build -DCMAKE_BUILD_TYPE=Release");
 	run_step("Compiling " + name, "cmake --build build -j$(nproc)");
-	run_step("Installing " + name, "sudo cmake --install build --prefix " + install_path.string());
+	//run_step("Installing " + name, "cmake --install build --prefix " + install_path.string());
+	run_step("Installing " + name, "cmake --install build");
+
+	// Remove development-only files after install
+	if (std::filesystem::exists(install_path / "include"))
+	{
+		std::filesystem::remove_all(install_path / "include");
+	}
+	if (std::filesystem::exists(install_path / "share/pkgconfig"))
+	{
+		std::filesystem::remove_all(install_path / "share/pkgconfig");
+	}
 
 	std::cout << "[OUT] " << name << " installed to: " << install_path / "bin" << "\n";
 }
