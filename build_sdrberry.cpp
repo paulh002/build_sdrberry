@@ -151,7 +151,7 @@ void update_repo(const std::string &name, const std::string &git_url,
 				 const std::filesystem::path &base_dir, const std::filesystem::path &install_base)
 {
 	auto repo_path = base_dir / name;
-	auto install_path = install_base / name;
+	auto install_path = install_base / name; // Not used at the moment
 
 	if (std::filesystem::exists(repo_path / ".git"))
 	{
@@ -183,7 +183,8 @@ void update_repo(const std::string &name, const std::string &git_url,
 		std::filesystem::remove_all(install_path / "share/pkgconfig");
 	}
 
-	std::cout << "[OUT] " << name << " installed to: " << install_path / "bin" << "\n";
+	//std::cout << "[OUT] " << name << " installed to: " << install_path / "bin" << "\n";
+	std::cout << "[OUT] " << name << " installed to /usr/local/bin\n";
 }
 
 int main()
