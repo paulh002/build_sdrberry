@@ -148,10 +148,9 @@ class WorkingDirGuard
 };
 
 void update_repo(const std::string &name, const std::string &git_url,
-				 const std::filesystem::path &base_dir, const std::filesystem::path &install_base)
+				 const std::filesystem::path &base_dir)
 {
 	auto repo_path = base_dir / name;
-	auto install_path = install_base / name; // Not used at the moment
 
 	if (std::filesystem::exists(repo_path / ".git"))
 	{
@@ -170,7 +169,8 @@ void update_repo(const std::string &name, const std::string &git_url,
 	WorkingDirGuard wd(repo_path);
 	run_step("Configuring " + name, "cmake -B build -DCMAKE_BUILD_TYPE=Release");
 	run_step("Compiling " + name, "cmake --build build -j$(nproc)");
-	//run_step("Installing " + name, "cmake --install build --prefix " + install_path.string());
+
+	// Installs to /usr/local/bin (default Linux prefix)
 	run_step("Installing " + name, "sudo cmake --install build");
 	std::cout << "[OUT] " << name << " installed to /usr/local/bin\n";
 }
@@ -181,21 +181,19 @@ int main()
 	{
 		auto start_dir = std::filesystem::current_path();
 		std::filesystem::path build_base = start_dir / "sdrberry_build";
-		std::filesystem::path install_base = build_base / "install";
 
 		std::filesystem::create_directories(build_base);
-		std::filesystem::create_directories(install_base);
 
 		std::cout << "[LOC] Working directory: " << start_dir << "\n";
-		std::cout << "[DIR] Build & Install root: " << build_base << "\n\n";
+		std::cout << "[DIR] Build root: " << build_base << "\n\n";
 
 		update_repo("sdrberry",
-					"https://github.com/paulh002/sdrberry.git",
-					build_base, install_base);
+					"https://github.com/sdrberry/sdrberry.git",
+					build_base);
 
 		update_repo("build_sdrberry",
-					"https://github.com/paulh002/build_sdrberry.git",
-					build_base, install_base);
+					"https://github.com/sdrberry/build_sdrberry.git",
+					build_base);
 
 		std::cout << "\n[DONE] All repositories updated and installed.\n";
 		std::cout << "[LOC] Back to: " << std::filesystem::current_path() << '\n';
