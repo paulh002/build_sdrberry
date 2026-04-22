@@ -188,11 +188,11 @@ int main()
 		std::cout << "[DIR] Build root: " << build_base << "\n\n";
 
 		update_repo("sdrberry",
-					"https://github.com/sdrberry/sdrberry.git",
+					"https://github.com/paulh002/sdrberry.git",
 					build_base);
 
 		update_repo("build_sdrberry",
-					"https://github.com/sdrberry/build_sdrberry.git",
+					"https://github.com/paulh002/build_sdrberry.git",
 					build_base);
 
 		std::cout << "\n[DONE] All repositories updated and installed.\n";
