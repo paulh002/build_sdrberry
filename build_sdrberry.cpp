@@ -201,8 +201,8 @@ int main()
 
 		std::cout << "[LOC] Working directory: " << start_dir << "\n";
 		std::cout << "[DIR] Build root: " << build_base << "\n\n";
-		
-		ensure_system_package("libpulse-simple0");
+
+		ensure_system_package("libpulse-dev");
 
 		update_repo("build_sdrberry",
 					"https://github.com/paulh002/build_sdrberry.git",
