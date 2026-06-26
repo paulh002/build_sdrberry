@@ -203,13 +203,13 @@ int main()
 		std::cout << "[DIR] Build root: " << build_base << "\n\n";
 		
 		ensure_system_package("libpulse-simple0");
-		
-		update_repo("sdrberry",
-					"https://github.com/paulh002/sdrberry.git",
-					build_base);
 
 		update_repo("build_sdrberry",
 					"https://github.com/paulh002/build_sdrberry.git",
+					build_base);
+		
+		update_repo("sdrberry",
+					"https://github.com/paulh002/sdrberry.git",
 					build_base);
 
 		std::cout << "\n[DONE] All repositories updated and installed.\n";
