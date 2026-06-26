@@ -175,6 +175,21 @@ void update_repo(const std::string &name, const std::string &git_url,
 	std::cout << "[OUT] " << name << " installed to /usr/local/bin\n";
 }
 
+void ensure_system_package(const std::string &pkg)
+{
+	// Check if already installed via dpkg-query
+	std::string check_cmd = "dpkg-query -W " + pkg + " >/dev/null 2>&1";
+	if (std::system(check_cmd.c_str()) == 0)
+	{
+		std::cout << "[PKG] " << pkg << " is already installed.\n";
+		return;
+	}
+
+	std::cout << "[PKG] " << pkg << " not found. Installing...\n";
+	run_step("Updating package lists", "sudo apt-get update -y");
+	run_step("Installing " + pkg, "sudo apt-get install -y " + pkg);
+}
+
 int main()
 {
 	try
@@ -186,7 +201,9 @@ int main()
 
 		std::cout << "[LOC] Working directory: " << start_dir << "\n";
 		std::cout << "[DIR] Build root: " << build_base << "\n\n";
-
+		
+		ensure_system_package("libpulse-simple0");
+		
 		update_repo("sdrberry",
 					"https://github.com/paulh002/sdrberry.git",
 					build_base);
