@@ -190,8 +190,28 @@ void ensure_system_package(const std::string &pkg)
 	run_step("Installing " + pkg, "sudo apt-get install -y " + pkg);
 }
 
-int main()
+int main(int argc, char* argv[])
 {
+	bool rebuild_only = false;
+
+	for (int i = 1; i < argc; ++i) {
+		std::string arg = argv[i];
+		if (arg == "--help" || arg == "-h") {
+			std::cout << "Usage: updater [OPTIONS]\n"
+			          << "  Default: Full update (deps + clone/pull + build + install)\n"
+			          << "  --rebuild Update and build build_sdrberry only\n"
+			          << "  --help            Show this message\n";
+			return 0;
+		}
+		else if (arg == "--rebuild" && i + 1 < argc) {
+			rebuild_only = true;
+		}
+		else {
+			std::cerr << "[ERR] Unknown option: " << arg << "\n";
+			return 1;
+		}
+	}
+	
 	try
 	{
 		auto start_dir = std::filesystem::current_path();
@@ -215,9 +235,12 @@ int main()
 					"https://github.com/paulh002/build_sdrberry.git",
 					build_base);
 		
-		update_repo("sdrberry",
-					"https://github.com/paulh002/sdrberry.git",
-					build_base);
+		if (!rebuild_only)
+		{
+			update_repo("sdrberry",
+				"https://github.com/paulh002/sdrberry.git",
+				build_base); 
+		}
 
 		std::cout << "\n[DONE] All repositories updated and installed.\n";
 		std::cout << "[LOC] Back to: " << std::filesystem::current_path() << '\n';
