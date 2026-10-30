@@ -203,6 +203,13 @@ int main()
 		std::cout << "[DIR] Build root: " << build_base << "\n\n";
 
 		ensure_system_package("libpulse-dev");
+		ensure_system_package("opus-tools");
+		ensure_system_package("libopus0");
+		ensure_system_package("libopus-dev");
+		ensure_system_package("libturbojpeg0-dev");
+		ensure_system_package("libssl-dev");
+		ensure_system_package("webp");
+		ensure_system_package("libwebp-dev");
 
 		update_repo("build_sdrberry",
 					"https://github.com/paulh002/build_sdrberry.git",
